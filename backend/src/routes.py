@@ -23,7 +23,7 @@ def register():
         return jsonify({"fail": "User already exists"}), 409
 
    
-
+    
     profile = Profile()
     user = User()
     user.email = email
@@ -44,7 +44,7 @@ def login():
     password = request.json.get('password')
     
     if not email:
-        return jsonify({"fail": "Email is required"}), 400  # Mejor usar 400 (Bad Request)
+        return jsonify({"error": "Email is required"}), 400  
      
     if not password:
         return jsonify({"error": "Password is required"}), 400
@@ -52,7 +52,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        return jsonify({"error": "Credentials are incorrects!"}), 401
+        return jsonify({"error": "User don't exist"}), 401
     
     if not user.verify_password(password):
         return jsonify({"error": "Credentials are incorrects!"}), 401
@@ -65,14 +65,11 @@ def login():
 
     datos = {
         "access_token": access_token,
-        "user": user.serialize()
+        # "user": user.serialize()
     }
 
 
     return jsonify(datos),200
-    
-
-
     
 
 @api.route('/profile', methods=['GET'])
@@ -88,41 +85,26 @@ def profile():
 
     return jsonify({
         "status": "success!",
-          "user": user.serialize()
+        "user": user.serialize()
         }),200
 
 @api.route('/profile', methods=['PUT'])
-@jwt_required()
+@jwt_required()  # ruta protegida
 def update_profile():
-    id = get_jwt_identity() 
+    id = get_jwt_identity()  # 1
     user = User.query.get(id)
+    data = request.get_json()
 
-    if not user:
-        return jsonify({"error": "User not found"}),401
+    user.profile.bio = data['bio'] if 'bio' in data else user.profile.bio
+    user.profile.github = data['github'] if 'github' in data else user.profile.github
+    user.profile.facebook = data['facebook'] if 'facebook' in data else user.profile.facebook
+    user.profile.instagram = data['instagram'] if 'instagram' in data else user.profile.instagram
+    user.profile.twitter = data['twitter'] if 'twitter' in data else user.profile.twitter
 
-    bio = request.json.get('bio')
-    github = request.json.get('github')
-    facebook = request.json.get('facebook')
-    instagram = request.json.get('instagram')
-    twitter = request.json.get('twitter')
-    avatar = request.json.get('avatar')
-
-    if bio:
-        user.profile.bio = bio
-    if github:
-        user.profile.github = github
-    if facebook:
-        user.profile.facebook = facebook
-    if instagram:
-        user.profile.instagram = instagram
-    if twitter:
-        user.profile.twitter = twitter
-    if avatar:
-        user.profile.avatar = avatar
-    
     user.save()
-
+    
     return jsonify({
         "status": "success",
-        "user updated": user.serialize()
-    }),200
+        "message": "Profile updated!",
+        "user": user.serialize()
+    }), 200

@@ -1,1 +1,0 @@
-pipenv install flask flask-migrate flask-cors flask-sqlachemy flask-jwt-extended python-dotenv pyschopg2-binary
