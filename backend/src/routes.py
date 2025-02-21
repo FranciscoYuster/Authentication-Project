@@ -65,7 +65,7 @@ def login():
 
     datos = {
         "access_token": access_token,
-        # "user": user.serialize()
+        "user": user.serialize()
     }
 
 

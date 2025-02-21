@@ -19,7 +19,7 @@ const Login = () => {
         const data = await login({ email, password });
 
         if (data.error) {
-            setError(data.error);
+            setError("User not found");
         } else {
             sessionStorage.setItem('access_token', data.access_token);
             const authData = await checkAuth();

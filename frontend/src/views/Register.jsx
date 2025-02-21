@@ -6,7 +6,7 @@ const Register = () => {
 
     const navigate = useNavigate()
 
-    const { user, register } = useAuth()
+    const { user, register, login } = useAuth()
 
     const [error, setError] = useState(null)
     const [message, setMessage] = useState(null)
@@ -20,29 +20,31 @@ const Register = () => {
         setError(null);
         if (email !== confirmEmail) {
             setError('Emails do not match')
-            return
+            return;
         }
         if (password !== confirmPassword) {
             setError('Passwords do not match')
-            return
+            return;
         }
 
         const data = await register({ email, password });
         if (data.error) {
             setError(data.error);
         } else if (data.success) {
-            setMessage(data.success)
-            setTimeout(() => {
-                navigate('/login'), { replace: true }
-            }, 4000)
+            setMessage('Registro exitoso. Iniciando sesión...');
+            
+            const loginData = await login({ email, password });
+            if (loginData.error) {
+                setError(loginData.error);
+            } else {
+                navigate('/profile', { replace: true });
+            }
         } else {
             setError('Something went wrong')
         }
     };
 
     if (user) return <Navigate to="/profile" replace />
-
-
 
     return (
         <div className='w-75 mx-auto my-5'>
@@ -95,7 +97,7 @@ const Register = () => {
                         onChange={e => setConfirmPassword(e.target.value)}
                     />
                 </div>
-                <button className="btn btn-primary btm-sm py-2 w-100">
+                <button className="btn btn-primary btn-sm py-2 w-100">
                     Register
                 </button>
             </form>
@@ -103,4 +105,4 @@ const Register = () => {
     )
 }
 
-export default Register
+export default Register;

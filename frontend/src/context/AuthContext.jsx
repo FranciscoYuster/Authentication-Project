@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
                 return { error: "No token" };
             }
             const token = sessionStorage.getItem("access_token");
-    
+
             const response = await fetch(`${baseUrl}/api/profile`, {
                 method: "GET",
                 headers: {
@@ -28,15 +28,15 @@ export const AuthProvider = ({ children }) => {
                     "Authorization": `Bearer ${token}`
                 }
             });
-    
+
             if (response.status === 401) {
                 return { error: "Unauthorized" };
             }
-    
+
             const data = await response.json();
             setUser(data.user);
             return { success: true, user: data.user };
-    
+
         } catch (error) {
             console.log(error.message);
             return { error: error.message };
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         }
     };
-    
+
 
 
     const login = async (credentials) => {
@@ -57,19 +57,21 @@ export const AuthProvider = ({ children }) => {
                 },
                 body: JSON.stringify(credentials)
             });
-
             const data = await response.json();
-
-            return data
-
+            if (response.ok) {
+                sessionStorage.setItem('access_token', data.access_token);
+                setUser(data.user);
+                return data;
+            } else {
+                return { error: data.error || 'Error desconocido' };
+            }
         } catch (error) {
-            console.log(error.message);
+            return { error: 'Error de conexión' };
         }
-
     };
 
     const logout = async () => {
-        if(sessionStorage.getItem("access_token")){
+        if (sessionStorage.getItem("access_token")) {
             sessionStorage.clear()
             setUser(null)
         }
@@ -95,9 +97,9 @@ export const AuthProvider = ({ children }) => {
 
     const updatedProfile = async (datos) => {
         try {
-            if(!sessionStorage.getItem("access_token")) 
+            if (!sessionStorage.getItem("access_token"))
                 return <Navigate to="/login" replace />
-                
+
             const token = sessionStorage.getItem("access_token");
 
             const response = await fetch(`${baseUrl}/api/profile`, {
@@ -105,16 +107,16 @@ export const AuthProvider = ({ children }) => {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
-                }, 
+                },
                 body: JSON.stringify(datos)
-                    
-                })
 
-                if (response.status == 401) <Navigate to="/login" replace />;
+            })
 
-                const data = await response.json();
-                setUser(data.user);
-                return data
+            if (response.status == 401) <Navigate to="/login" replace />;
+
+            const data = await response.json();
+            setUser(data.user);
+            return data
 
         } catch (error) {
             console.log(error.message);
@@ -122,7 +124,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         }
     }
-    
+
 
 
 

@@ -41,7 +41,7 @@ const Profile = () => {
                    {
                 !!error && (
                     <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>Error!</strong> {error}.
+                        <strong>Error!</strong> {error}
                         <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={() => setError(null)}></button>
                     </div>
                 )
@@ -50,7 +50,7 @@ const Profile = () => {
             {
                 !!message && (
                     <div className="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>Success!</strong> {message}.
+                        <strong>Success!</strong> {message}
                         <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={() => setMessage(null)}></button>
                     </div>
                 )
